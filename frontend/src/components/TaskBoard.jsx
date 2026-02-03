@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTasks } from "../context/TaskContext";
-import "./TaskBoard.css";
+import "./Taskboard.css";
 
 
 export default function TaskBoard() {

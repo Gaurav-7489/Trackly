@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import "./Login.css";
+
 
 const MAX_ATTEMPTS = 5;
 const BLOCK_TIME = 10 * 60 * 1000; // 10 minutes

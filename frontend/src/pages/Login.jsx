@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 import { useNavigate } from "react-router-dom";
-import Toast from "../components/Toast";
-import { mapAuthError } from "../lib/authErrors";
 import { useAuth } from "../context/AuthContext";
+
+const MAX_ATTEMPTS = 5;
+const BLOCK_TIME = 10 * 60 * 1000; // 10 minutes
 
 export default function Login() {
   const navigate = useNavigate();
@@ -13,103 +14,129 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [isSignup, setIsSignup] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState(null);
+  const [message, setMessage] = useState(null);
 
-  // 🔥 AUTO REDIRECT IF ALREADY LOGGED IN
+  // auto redirect
   useEffect(() => {
-    if (user) {
-      navigate("/dashboard");
-    }
+    if (user) navigate("/dashboard");
   }, [user, navigate]);
+
+  function getLoginState() {
+    return JSON.parse(localStorage.getItem("login_state")) || {
+      attempts: 0,
+      blockedUntil: null,
+    };
+  }
+
+  function saveLoginState(state) {
+    localStorage.setItem("login_state", JSON.stringify(state));
+  }
+
+  function resetLoginState() {
+    localStorage.removeItem("login_state");
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setLoading(true);
-    setToast(null);
+    setMessage(null);
 
-    let result;
+    const state = getLoginState();
+
+    if (state.blockedUntil && Date.now() < state.blockedUntil) {
+      setMessage("Too many attempts. Try again in a few minutes.");
+      return;
+    }
+
+    setLoading(true);
 
     try {
       if (isSignup) {
-        result = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
         });
 
-        if (result.error) {
-          throw result.error;
+        if (error) throw error;
+
+        if (data.user) {
+          await supabase.from("profiles").insert({
+            id: data.user.id,
+            username: email.split("@")[0],
+          });
         }
 
-        // ✅ CREATE PROFILE IMMEDIATELY
-        await supabase.from("profiles").insert({
-          id: result.data.user.id,
-          username: email.split("@")[0],
-        });
+        if (!data.session) {
+          setMessage("Account created. Check your email to verify.");
+        } else {
+          setMessage("Account created. Logging you in...");
+        }
+
+        resetLoginState();
       } else {
-        result = await supabase.auth.signInWithPassword({
+        const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
 
-        if (result.error) {
-          throw result.error;
-        }
-      }
+        if (error) {
+          state.attempts += 1;
 
-      // ❌ no manual navigate
-      // AuthContext + useEffect handles redirect
+          if (state.attempts >= MAX_ATTEMPTS) {
+            state.blockedUntil = Date.now() + BLOCK_TIME;
+            setMessage("Too many failed attempts. Locked for 10 minutes.");
+          } else {
+            setMessage(
+              `Invalid credentials. Attempts left: ${
+                MAX_ATTEMPTS - state.attempts
+              }`
+            );
+          }
+
+          saveLoginState(state);
+          throw error;
+        }
+
+        resetLoginState();
+      }
     } catch (err) {
       console.error(err);
-      const readableError = mapAuthError(err, isSignup);
-      setToast(readableError || "Something went wrong");
+      if (!message) setMessage(err.message);
     }
 
     setLoading(false);
   }
 
   return (
-    <>
-      <div style={{ padding: "40px", maxWidth: "400px" }}>
-        <h1>{isSignup ? "Create Account" : "Login"}</h1>
+    <div className="auth-wrap">
+      <h2>{isSignup ? "Create account" : "Login"}</h2>
 
-        <form onSubmit={handleSubmit}>
-          <input
-            type="email"
-            placeholder="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <br /><br />
+      <form onSubmit={handleSubmit}>
+        <input
+          type="email"
+          placeholder="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
 
-          <input
-            type="password"
-            placeholder="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <br /><br />
+        <input
+          type="password"
+          placeholder="password (min 6 chars)"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
 
-          <button type="submit" disabled={loading}>
-            {loading
-              ? "processing..."
-              : isSignup
-              ? "Create account"
-              : "Login"}
-          </button>
-        </form>
-
-        <br />
-
-        <button onClick={() => setIsSignup(!isSignup)}>
-          {isSignup
-            ? "Already have an account? Login"
-            : "New here? Create account"}
+        <button disabled={loading}>
+          {loading ? "processing..." : isSignup ? "Sign up" : "Login"}
         </button>
-      </div>
+      </form>
 
-      <Toast message={toast} onClose={() => setToast(null)} />
-    </>
+      {message && <p className="msg">{message}</p>}
+
+      <button className="link" onClick={() => setIsSignup(!isSignup)}>
+        {isSignup ? "Already have an account?" : "New here?"}
+      </button>
+    </div>
   );
 }

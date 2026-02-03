@@ -5,19 +5,22 @@ body,
   height: 100%;
 }
 
-
+/* ===== DARK THEME (default) ===== */
 :root {
   --bg: #0b0b0b;
-  --card: #111;
-  --text: #fff;
-  --muted: #777;
-  --border: #222;
+  --card: #111111;
+  --card-shadow: #0a0a0a; /* 🔑 NEW */
+  --text: #ffffff;
+  --muted: #777777;
+  --border: #222222;
 }
 
+/* ===== LIGHT THEME ===== */
 .light {
   --bg: #f9fafb;
   --card: #ffffff;
-  --text: #111;
-  --muted: #555;
-  --border: #ddd;
+  --card-shadow: #f2f3f5; /* 🔑 NEW */
+  --text: #111111;
+  --muted: #555555;
+  --border: #dddddd;
 }

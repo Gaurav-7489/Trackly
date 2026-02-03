@@ -208,6 +208,18 @@ form button:disabled {
 .micro:hover {
     color: #999;
 }
+/* message colors */
+.msg.success {
+  color: #22c55e;
+}
+
+.msg.error {
+  color: #ef4444;
+}
+
+.msg.warn {
+  color: #f59e0b;
+}
 
 /* animations */
 @keyframes fadeIn {

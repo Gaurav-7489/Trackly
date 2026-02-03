@@ -6,7 +6,7 @@ import "./Login.css";
 
 const MAX_ATTEMPTS = 5;
 const BLOCK_TIME = 10 * 60 * 1000;
-const CONFIRM_RESET_TIME = 15 * 1000; // 15s auto reset
+const AUTO_SWITCH_DELAY = 5000; // 5s after signup success
 
 export default function Login() {
   const navigate = useNavigate();
@@ -16,33 +16,15 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [isSignup, setIsSignup] = useState(false);
   const [loading, setLoading] = useState(false);
+
   const [message, setMessage] = useState(null);
+  const [messageType, setMessageType] = useState(null); // success | error | warn
   const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
 
   // auto redirect if already logged in
   useEffect(() => {
     if (user) navigate("/dashboard");
   }, [user, navigate]);
-
-  // 🔁 AUTO RESET waiting state (react-style "refresh")
-  useEffect(() => {
-    const waiting = localStorage.getItem("awaiting_email_confirmation");
-
-    if (waiting) {
-      setAwaitingConfirmation(true);
-      setMessage(
-        "Email sent. Please confirm it, then log in."
-      );
-
-      const timer = setTimeout(() => {
-        localStorage.removeItem("awaiting_email_confirmation");
-        setAwaitingConfirmation(false);
-        setMessage(null);
-      }, CONFIRM_RESET_TIME);
-
-      return () => clearTimeout(timer);
-    }
-  }, []);
 
   function getLoginState() {
     return JSON.parse(localStorage.getItem("login_state")) || {
@@ -62,11 +44,13 @@ export default function Login() {
   async function handleSubmit(e) {
     e.preventDefault();
     setMessage(null);
+    setMessageType(null);
 
     const state = getLoginState();
 
     if (state.blockedUntil && Date.now() < state.blockedUntil) {
-      setMessage("Too many attempts. Try again in a few minutes.");
+      setMessage("Too many attempts. Try again later.");
+      setMessageType("error");
       return;
     }
 
@@ -89,14 +73,19 @@ export default function Login() {
           });
         }
 
-        // 🔑 mark waiting state
-        localStorage.setItem("awaiting_email_confirmation", "true");
-
-        setIsSignup(false);
         setAwaitingConfirmation(true);
         setMessage(
-          "Confirmation email sent. Please verify it, then log in."
+          "Signup successful. Check your email and confirm. Redirecting to login…"
         );
+        setMessageType("success");
+
+        // stay on signup, then switch after delay
+        setTimeout(() => {
+          setIsSignup(false);
+          setAwaitingConfirmation(false);
+          setMessage(null);
+          setMessageType(null);
+        }, AUTO_SWITCH_DELAY);
 
         resetLoginState();
       }
@@ -104,7 +93,8 @@ export default function Login() {
       // ---------------- LOGIN ----------------
       else {
         if (awaitingConfirmation) {
-          setMessage("Waiting for email confirmation.");
+          setMessage("Please confirm your email before logging in.");
+          setMessageType("warn");
           setLoading(false);
           return;
         }
@@ -120,36 +110,38 @@ export default function Login() {
           if (state.attempts >= MAX_ATTEMPTS) {
             state.blockedUntil = Date.now() + BLOCK_TIME;
             setMessage("Too many failed attempts. Locked for 10 minutes.");
+            setMessageType("error");
           } else {
             setMessage(
               `Invalid credentials. Attempts left: ${
                 MAX_ATTEMPTS - state.attempts
               }`
             );
+            setMessageType("error");
           }
 
           saveLoginState(state);
           throw error;
         }
 
-        // 🔐 email verification check
         if (!data.user.email_confirmed_at) {
           await supabase.auth.signOut();
           setAwaitingConfirmation(true);
-          setMessage(
-            "Email not verified yet. Please confirm the email."
-          );
+          setMessage("Email not verified yet. Please check your inbox.");
+          setMessageType("warn");
           setLoading(false);
           return;
         }
 
-        localStorage.removeItem("awaiting_email_confirmation");
         resetLoginState();
         navigate("/dashboard");
       }
     } catch (err) {
       console.error(err);
-      if (!message) setMessage(err.message);
+      if (!message) {
+        setMessage(err.message);
+        setMessageType("error");
+      }
     }
 
     setLoading(false);
@@ -182,28 +174,24 @@ export default function Login() {
         />
 
         <button
-          disabled={loading || awaitingConfirmation}
+          disabled={loading}
           className={isSignup ? "btn signup" : "btn login"}
         >
-          {loading
-            ? "processing..."
-            : awaitingConfirmation
-            ? "Waiting for confirmation…"
-            : isSignup
-            ? "Sign up"
-            : "Login"}
+          {loading ? "processing..." : isSignup ? "Sign up" : "Login"}
         </button>
 
         <p className="micro">
           {isSignup
-            ? "One-time signup. Email verification required."
-            : awaitingConfirmation
-            ? "Confirm the email, then try logging in."
-            : "Welcome back. Let’s continue where you left off."}
+            ? "Create once. Verify email. Done."
+            : "Welcome back. Log in to continue."}
         </p>
       </form>
 
-      {message && <p className="msg">{message}</p>}
+      {message && (
+        <p className={`msg ${messageType}`}>
+          {message}
+        </p>
+      )}
 
       <button
         className="link"
@@ -211,7 +199,7 @@ export default function Login() {
           setIsSignup(!isSignup);
           setAwaitingConfirmation(false);
           setMessage(null);
-          localStorage.removeItem("awaiting_email_confirmation");
+          setMessageType(null);
         }}
       >
         {isSignup ? "Already have an account?" : "First time? Create an account"}

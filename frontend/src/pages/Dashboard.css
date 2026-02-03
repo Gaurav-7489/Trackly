@@ -1,40 +1,45 @@
 .dashboard {
-  padding: clamp(1rem, 3vw, 1.5rem);
-  padding-bottom: 90px;
+  padding: clamp(1rem, 4vw, 2rem);
+  padding-bottom: clamp(5rem, 12vh, 7rem); /* space for tools dock */
   background: var(--bg);
   color: var(--text);
+  min-height: 100svh;
 }
 
-/* TOP */
+/* ================= TOP ================= */
+
 .dashboard-top {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  align-items: flex-start;
+  gap: clamp(0.75rem, 3vw, 1.5rem);
+  margin-bottom: clamp(1.25rem, 4vw, 2rem);
 }
 
 .welcome h1 {
   margin: 0;
-  font-size: clamp(1.3rem, 4vw, 1.7rem);
+  font-size: clamp(1.4rem, 5vw, 1.9rem);
+  line-height: 1.15;
 }
 
 .welcome p {
-  margin: 0.25rem 0 0;
-  font-size: 0.85rem;
+  margin-top: 0.3em;
+  font-size: clamp(0.8rem, 3.5vw, 0.95rem);
   color: var(--muted);
 }
 
-/* 50 / 50 layout */
+/* ================= STATS ================= */
+
 .dashboard-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
+  gap: clamp(1rem, 4vw, 2rem);
+  margin-bottom: clamp(1.25rem, 4vw, 2rem);
 }
 
-/* MOBILE */
-@media (max-width: 768px) {
+/* ================= MOBILE ================= */
+
+@media (max-width: 48rem) {
   .dashboard-top {
     flex-direction: column;
     align-items: stretch;

@@ -1,0 +1,112 @@
+.focus-timer {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 1.1rem;
+  text-align: center;
+  color: var(--text);
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+/* clock */
+.clock {
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+/* title */
+.title {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* timer */
+.time {
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.focus-timer.running .time {
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+/* presets */
+.presets {
+  display: flex;
+  gap: 0.4rem;
+  justify-content: center;
+}
+
+.presets button {
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.presets button.active {
+  background: #6366f1;
+  color: #fff;
+  border-color: #6366f1;
+}
+
+/* controls */
+.controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.controls button {
+  flex: 1;
+  padding: 0.5rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.controls .primary {
+  background: #6366f1;
+  color: #fff;
+  border-color: #6366f1;
+}
+
+/* toggles */
+.toggles {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.65rem;
+  color: var(--muted);
+}
+
+.toggles input {
+  margin-right: 4px;
+}
+
+/* sessions */
+.session-count {
+  font-size: 0.65rem;
+  color: var(--muted);
+}
+
+/* animation */
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* light polish */
+.light .focus-timer {
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}

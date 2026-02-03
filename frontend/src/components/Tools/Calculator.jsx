@@ -1,112 +1,77 @@
 import { useState } from "react";
+import Graph from "./Graph";
+import "./Calculator.css";
 
 export default function Calculator() {
   const [display, setDisplay] = useState("0");
+  const [graphExpr, setGraphExpr] = useState(null);
+
+  function smartAppend(prev, val) {
+    const last = prev.slice(-1);
+
+    if (
+      (val === "x" && /[0-9)]/.test(last)) ||
+      (val === "(" && /[0-9x)]/.test(last)) ||
+      (/[0-9]/.test(val) && /[x)]/.test(last))
+    ) {
+      return prev + "*" + val;
+    }
+
+    return prev + val;
+  }
 
   function input(val) {
-    setDisplay((prev) =>
-      prev === "0" ? val : prev + val
-    );
+    setDisplay((prev) => {
+      const next = prev === "0" ? val : smartAppend(prev, val);
+      setGraphExpr(next); // always graph what user types
+      return next;
+    });
   }
 
   function clear() {
     setDisplay("0");
-  }
-
-  function backspace() {
-    setDisplay((prev) =>
-      prev.length > 1 ? prev.slice(0, -1) : "0"
-    );
+    setGraphExpr(null);
   }
 
   function calculate() {
     try {
-      const result = Function(`"use strict"; return (${display})`)();
+      const expr = display
+        .replace(/sin/g, "Math.sin")
+        .replace(/cos/g, "Math.cos")
+        .replace(/tan/g, "Math.tan");
+
+      // eslint-disable-next-line no-new-func
+      const result = Function(`return (${expr})`)();
       setDisplay(String(result));
+      // ⛔ DO NOT clear graphExpr
     } catch {
       setDisplay("Error");
     }
   }
 
   return (
-    <div style={box}>
-      <div style={screen}>{display}</div>
+    <div className="calculator">
+      <div className="calc-screen">{display}</div>
 
-      <div style={grid}>
-        <Btn onClick={clear}>C</Btn>
-        <Btn onClick={backspace}>⌫</Btn>
-        <Btn onClick={() => input("%")}>%</Btn>
-        <Btn onClick={() => input("/")}>÷</Btn>
+      {graphExpr && <Graph expr={graphExpr} />}
 
-        <Btn onClick={() => input("7")}>7</Btn>
-        <Btn onClick={() => input("8")}>8</Btn>
-        <Btn onClick={() => input("9")}>9</Btn>
-        <Btn onClick={() => input("*")}>×</Btn>
+      <div className="sci-row">
+        <button onClick={() => input("sin(")}>sin</button>
+        <button onClick={() => input("cos(")}>cos</button>
+        <button onClick={() => input("tan(")}>tan</button>
+        <button onClick={() => input("x")}>x</button>
+      </div>
 
-        <Btn onClick={() => input("4")}>4</Btn>
-        <Btn onClick={() => input("5")}>5</Btn>
-        <Btn onClick={() => input("6")}>6</Btn>
-        <Btn onClick={() => input("-")}>−</Btn>
+      <div className="calc-grid">
+        {["7","8","9","/","4","5","6","*","1","2","3","-","0","+","(",")"].map(
+          (k) => (
+            <button key={k} onClick={() => input(k)}>{k}</button>
+          )
+        )}
 
-        <Btn onClick={() => input("1")}>1</Btn>
-        <Btn onClick={() => input("2")}>2</Btn>
-        <Btn onClick={() => input("3")}>3</Btn>
-        <Btn onClick={() => input("+")}>+</Btn>
-
-        <Btn onClick={() => input("0")} wide>0</Btn>
-        <Btn onClick={() => input(".")}>.</Btn>
-        <Btn onClick={calculate}>=</Btn>
+        <button className="btn-danger" onClick={clear}>C</button>
+        <button className="btn-equal" onClick={calculate}>=</button>
       </div>
     </div>
   );
 }
-
-function Btn({ children, onClick, wide }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        ...btn,
-        gridColumn: wide ? "span 2" : "span 1",
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
-const box = {
-  background: "#111",
-  padding: "16px",
-  borderRadius: "12px",
-  color: "#fff",
-  width: "100%",
-  maxWidth: "320px",
-  margin: "0 auto",
-};
-
-const screen = {
-  background: "#000",
-  padding: "12px",
-  fontSize: "24px",
-  textAlign: "right",
-  borderRadius: "8px",
-  marginBottom: "12px",
-  overflowX: "auto",
-};
-
-const grid = {
-  display: "grid",
-  gridTemplateColumns: "repeat(4, 1fr)",
-  gap: "8px",
-};
-
-const btn = {
-  padding: "14px",
-  fontSize: "18px",
-  background: "#222",
-  color: "#fff",
-  border: "none",
-  borderRadius: "8px",
-  cursor: "pointer",
-};

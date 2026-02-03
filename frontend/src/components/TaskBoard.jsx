@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useTasks } from "../context/TaskContext";
+import "./TaskBoard.css";
+
 
 export default function TaskBoard() {
   const {
@@ -13,7 +15,7 @@ export default function TaskBoard() {
 
   const [newTask, setNewTask] = useState("");
 
-  if (loading) return <p>Loading weekly tasks...</p>;
+  if (loading) return <p className="task-loading">Loading weekly tasks…</p>;
 
   function handleAdd() {
     if (!newTask.trim()) return;
@@ -22,67 +24,54 @@ export default function TaskBoard() {
   }
 
   return (
-    <div>
-      <h2>
-        Weekly Tasks <small>(week of {weekStart})</small>
-      </h2>
+    <section className="task-board">
+      <div className="task-header">
+        <h2>Weekly Tasks</h2>
+        <span className="week-label">Week of {weekStart}</span>
+      </div>
 
-      <div style={{ marginBottom: "12px" }}>
+      <div className="task-add">
         <input
-          placeholder="add weekly task..."
+          placeholder="Add a task for this week…"
           value={newTask}
           onChange={(e) => setNewTask(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleAdd()}
         />
         <button onClick={handleAdd}>Add</button>
       </div>
 
-      {weeklyTasks.length === 0 && (
-        <p>No tasks for this week yet.</p>
+      {weeklyTasks.length === 0 ? (
+        <p className="empty-state">No tasks yet. Start small.</p>
+      ) : (
+        <ul className="task-list">
+          {weeklyTasks.map((task) => (
+            <li
+              key={task.id}
+              className={`task-item ${task.checked ? "done" : ""}`}
+            >
+              <label className="task-check">
+                <input
+                  type="checkbox"
+                  checked={task.checked}
+                  onChange={() => toggleTask(task.id, task.checked)}
+                />
+                <span />
+              </label>
+
+
+              <span className="task-title">{task.title}</span>
+
+              <button
+                className="delete-btn"
+                onClick={() => deleteTask(task.id)}
+                aria-label="Delete task"
+              >
+                ✕
+              </button>
+            </li>
+          ))}
+        </ul>
       )}
-
-      <ul style={{ listStyle: "none", padding: 0 }}>
-        {weeklyTasks.map((task) => (
-          <li
-            key={task.id}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              marginBottom: "8px",
-            }}
-          >
-            <input
-              type="checkbox"
-              checked={task.checked}
-              onChange={() =>
-                toggleTask(task.id, task.checked)
-              }
-            />
-
-            <span
-              style={{
-                marginLeft: "8px",
-                textDecoration: task.checked
-                  ? "line-through"
-                  : "none",
-                opacity: task.checked ? 0.6 : 1,
-                flexGrow: 1,
-              }}
-            >
-              {task.title}
-            </span>
-
-            <button
-              onClick={() => deleteTask(task.id)}
-              style={{
-                marginLeft: "8px",
-                color: "red",
-              }}
-            >
-              ✕
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
+    </section>
   );
 }

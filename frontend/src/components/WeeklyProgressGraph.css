@@ -1,0 +1,47 @@
+.weekly-graph {
+  margin-top: 1.8rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
+
+  background: linear-gradient(
+    180deg,
+    var(--card),
+    color-mix(in srgb, var(--card) 92%, #000 8%)
+  );
+
+  border: 1px solid var(--border);
+  border-radius: 16px;
+
+  color: var(--text);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+/* header */
+.graph-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.8rem;
+}
+
+.graph-header h3 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.graph-sub {
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+/* chart container */
+.graph-container {
+  width: 100%;
+  height: clamp(240px, 40vh, 320px);
+}
+
+/* light theme polish */
+.light .weekly-graph {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}

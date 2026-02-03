@@ -1,0 +1,46 @@
+.tools-mini {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 999;
+
+  display: flex;
+  gap: 0.4rem;
+
+  padding: 0.4rem;
+  border-radius: 14px;
+
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+/* buttons */
+.tools-mini button {
+  background: transparent;
+  border: none;
+
+  font-size: 1.2rem;
+  line-height: 1;
+  color: var(--text);
+
+  padding: 0.35rem;
+  border-radius: 10px;
+
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.tools-mini button:hover {
+  background: var(--bg);
+  transform: translateY(-2px);
+}
+
+.tools-mini button:active {
+  transform: translateY(0);
+}
+
+/* light theme polish */
+.light .tools-mini {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+}

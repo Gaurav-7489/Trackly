@@ -1,0 +1,167 @@
+.task-board {
+  background: linear-gradient(
+    180deg,
+    var(--card),
+    color-mix(in srgb, var(--card) 92%, #000 8%)
+  );
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  margin-bottom: 1.5rem;
+
+  color: var(--text);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+/* header */
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 1rem;
+}
+
+.task-header h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.week-label {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+/* add task */
+.task-add {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.task-add input {
+  flex: 1;
+  padding: 0.6rem 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.85rem;
+}
+
+.task-add input::placeholder {
+  color: var(--muted);
+}
+
+.task-add input:focus {
+  outline: none;
+  border-color: #6366f1;
+}
+
+.task-add button {
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  border: none;
+  background: #6366f1;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.task-add button:hover {
+  opacity: 0.9;
+}
+
+/* list */
+.task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.task-item:last-child {
+  border-bottom: none;
+}
+
+.task-title {
+  flex: 1;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+/* done */
+.task-item.done .task-title {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+/* delete */
+.delete-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.delete-btn:hover {
+  color: #ef4444;
+}
+
+/* states */
+.empty-state,
+.task-loading {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* custom checkbox */
+.task-check {
+  display: flex;
+  align-items: center;
+}
+
+.task-check input {
+  display: none;
+}
+
+.task-check span {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  cursor: pointer;
+  position: relative;
+}
+
+.task-check input:checked + span {
+  background: #22c55e;
+  border-color: #22c55e;
+}
+
+.task-check input:checked + span::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 5px;
+  width: 4px;
+  height: 7px;
+  border: solid #000;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* light theme polish */
+.light .task-board {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}

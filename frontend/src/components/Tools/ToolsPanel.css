@@ -1,0 +1,25 @@
+.tools-panel {
+  margin-top: 2rem;
+
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(180px, 1fr)
+  );
+  gap: 0.75rem;
+}
+
+/* tool cards inside panel */
+.tools-panel > * {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0.9rem;
+
+  color: var(--text);
+}
+
+/* light theme polish */
+.light .tools-panel > * {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}

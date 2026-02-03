@@ -1,42 +1,54 @@
 import { useRef, useState, useEffect } from "react";
+import "./Blackboard.css";
 
 export default function Blackboard() {
   const canvasRef = useRef(null);
   const ctxRef = useRef(null);
 
   const [drawing, setDrawing] = useState(false);
-  const [color, setColor] = useState("#00ff00"); // default green
-  const [lineWidth, setLineWidth] = useState(4);
+  const [color, setColor] = useState("var(--text)");
+  const [lineWidth, setLineWidth] = useState(0.35);
+  const [mode, setMode] = useState("draw");
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    canvas.width = canvas.offsetWidth;
-    canvas.height = 350;
-
     const ctx = canvas.getContext("2d");
-    ctx.lineCap = "round";
-    ctx.strokeStyle = color;
-    ctx.lineWidth = lineWidth;
     ctxRef.current = ctx;
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+    }
+
+    resize();
+
+    const observer = new ResizeObserver(resize);
+    observer.observe(canvas);
+
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
     if (!ctxRef.current) return;
     ctxRef.current.strokeStyle = color;
     ctxRef.current.lineWidth = lineWidth;
-  }, [color, lineWidth]);
+    ctxRef.current.globalCompositeOperation =
+      mode === "erase" ? "destination-out" : "source-over";
+  }, [color, lineWidth, mode]);
 
   function getPos(e) {
     const rect = canvasRef.current.getBoundingClientRect();
-    if (e.touches) {
-      return {
-        x: e.touches[0].clientX - rect.left,
-        y: e.touches[0].clientY - rect.top,
-      };
-    }
+    const t = e.touches?.[0];
     return {
-      x: e.nativeEvent.offsetX,
-      y: e.nativeEvent.offsetY,
+      x: (t?.clientX ?? e.clientX) - rect.left,
+      y: (t?.clientY ?? e.clientY) - rect.top,
     };
   }
 
@@ -55,70 +67,54 @@ export default function Blackboard() {
   }
 
   function stopDraw() {
-    ctxRef.current.closePath();
     setDrawing(false);
+    ctxRef.current.closePath();
   }
 
   function clearBoard() {
-    const canvas = canvasRef.current;
-    ctxRef.current.clearRect(0, 0, canvas.width, canvas.height);
+    const c = canvasRef.current;
+    ctxRef.current.clearRect(0, 0, c.width, c.height);
   }
 
   return (
-    <div style={box}>
-      <b>🧑‍🏫 Blackboard</b>
+    <section className="bb-root">
+      <header className="bb-toolbar">
+        <div className="bb-group">
+          <button onClick={() => setColor("var(--text)")}>✏️</button>
+          <button onClick={() => setColor("#ff4444")}>🔴</button>
+          <button onClick={() => setColor("#00cc66")}>🟢</button>
+        </div>
 
-      <div style={toolbar}>
-        <button onClick={() => setColor("#00ff00")}>🟢</button>
-        <button onClick={() => setColor("#ffffff")}>⚪</button>
-        <button onClick={() => setColor("#ff4444")}>🔴</button>
-        <button onClick={() => setColor("#000000")}>🧽 Erase</button>
+        <div className="bb-group">
+          <button onClick={() => setMode("draw")}>Draw</button>
+          <button onClick={() => setMode("erase")}>Erase</button>
+        </div>
 
         <select
           value={lineWidth}
           onChange={(e) => setLineWidth(Number(e.target.value))}
         >
-          <option value={2}>Thin</option>
-          <option value={4}>Normal</option>
-          <option value={7}>Thick</option>
+          <option value={0.2}>Thin</option>
+          <option value={0.35}>Normal</option>
+          <option value={0.6}>Thick</option>
         </select>
 
-        <button onClick={clearBoard}>Clear All</button>
-      </div>
+        <button onClick={clearBoard}>Clear</button>
+      </header>
 
-      <canvas
-        ref={canvasRef}
-        style={canvasStyle}
-        onMouseDown={startDraw}
-        onMouseMove={draw}
-        onMouseUp={stopDraw}
-        onMouseLeave={stopDraw}
-        onTouchStart={startDraw}
-        onTouchMove={draw}
-        onTouchEnd={stopDraw}
-      />
-    </div>
+      <div className="bb-canvas-wrap">
+        <canvas
+          ref={canvasRef}
+          className="bb-canvas"
+          onMouseDown={startDraw}
+          onMouseMove={draw}
+          onMouseUp={stopDraw}
+          onMouseLeave={stopDraw}
+          onTouchStart={startDraw}
+          onTouchMove={draw}
+          onTouchEnd={stopDraw}
+        />
+      </div>
+    </section>
   );
 }
-
-const box = {
-  background: "#111",
-  padding: "12px",
-  borderRadius: "12px",
-  color: "#fff",
-};
-
-const toolbar = {
-  display: "flex",
-  gap: "8px",
-  margin: "10px 0",
-  flexWrap: "wrap",
-};
-
-const canvasStyle = {
-  width: "100%",
-  background: "#000",
-  borderRadius: "8px",
-  border: "1px solid #333",
-  touchAction: "none",
-};

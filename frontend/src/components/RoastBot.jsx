@@ -1,28 +1,24 @@
-import { useState } from "react";
+import { useMemo } from "react";
+import "./RoastBot.css";
+
+const ROASTS = [
+  "Productivity detected… barely.",
+  "You opened the app. That’s a start.",
+  "This week is still salvageable.",
+  "Momentum is optional, apparently.",
+  "Small steps count. Even today.",
+];
 
 export default function RoastBot() {
-  const [roast] = useState(
-    "I’m watching you. Productivity detected… barely."
+  const roast = useMemo(
+    () => ROASTS[Math.floor(Math.random() * ROASTS.length)],
+    []
   );
 
   return (
-    <div style={container}>
-      <p style={roastStyle}>{roast}</p>
+    <div className="roast-bot">
+      <span className="roast-label">RoastBot</span>
+      <p className="roast-text">{roast}</p>
     </div>
   );
 }
-
-const container = {
-  margin: "10px 0",
-  padding: "12px",
-  background: "#0b0b0b",
-  borderRadius: "10px",
-  textAlign: "center",
-  border: "1px solid #222",
-};
-
-const roastStyle = {
-  fontSize: "14px",
-  fontWeight: "600",
-  color: "#ff4d4d",
-};

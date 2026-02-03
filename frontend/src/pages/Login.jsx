@@ -88,8 +88,7 @@ export default function Login() {
             setMessage("Too many failed attempts. Locked for 10 minutes.");
           } else {
             setMessage(
-              `Invalid credentials. Attempts left: ${
-                MAX_ATTEMPTS - state.attempts
+              `Invalid credentials. Attempts left: ${MAX_ATTEMPTS - state.attempts
               }`
             );
           }
@@ -110,6 +109,11 @@ export default function Login() {
 
   return (
     <div className="auth-wrap">
+      <div className="brand">
+        <h1>Trackly</h1>
+        <p>by "Under Outside The Stationary" clan</p>
+      </div>
+
       <h2>{isSignup ? "Create account" : "Login"}</h2>
 
       <form onSubmit={handleSubmit}>
@@ -129,9 +133,19 @@ export default function Login() {
           required
         />
 
-        <button disabled={loading}>
+        <button
+          disabled={loading}
+          className={isSignup ? "btn signup" : "btn login"}
+        >
           {loading ? "processing..." : isSignup ? "Sign up" : "Login"}
         </button>
+        <p className="micro">
+          {isSignup
+            ? "Takes less than a minute. We timed it."
+            : "Welcome back. Let’s continue where you left off."}
+        </p>
+
+
       </form>
 
       {message && <p className="msg">{message}</p>}

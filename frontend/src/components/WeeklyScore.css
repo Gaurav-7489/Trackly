@@ -1,0 +1,74 @@
+.weekly-score {
+  margin-top: 1.5rem;
+  padding: clamp(1rem, 3vw, 1.4rem);
+  max-width: 320px;
+
+  background: linear-gradient(
+    180deg,
+    var(--card),
+    color-mix(in srgb, var(--card) 90%, #000 10%)
+  );
+
+  border: 1px solid var(--border);
+  border-radius: 16px;
+
+  color: var(--text);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+/* header */
+.score-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.week {
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+/* score number */
+.score-value {
+  margin: 0.9rem 0 0.5rem;
+  font-size: clamp(2rem, 6vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.score-value span {
+  font-size: 0.9rem;
+  font-weight: 500;
+  opacity: 0.6;
+}
+
+/* hint */
+.score-hint {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+/* status states */
+.weekly-score.great {
+  border-color: rgba(34, 197, 94, 0.45);
+}
+
+.weekly-score.okay {
+  border-color: rgba(234, 179, 8, 0.45);
+}
+
+.weekly-score.low {
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+/* light theme polish */
+.light .weekly-score {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}

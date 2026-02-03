@@ -3,6 +3,7 @@ import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
 import { calculateStreak } from "../lib/streakLogic";
 
+
 export default function StreakCounter() {
   const { user } = useAuth();
   const [streak, setStreak] = useState(0);

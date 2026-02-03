@@ -13,6 +13,7 @@ import {
 } from "recharts";
 
 
+
 export default function ProgressGraph() {
     const { user } = useAuth();
     const [data, setData] = useState([]);

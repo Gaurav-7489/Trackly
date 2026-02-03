@@ -1,43 +1,37 @@
-export default function ToolModal({ open, onClose, children }) {
+import { useEffect } from "react";
+import "./ToolModal.css";
+
+export default function ToolModal({ open, onClose, variant = "default", children }) {
+  useEffect(() => {
+    function handleEsc(e) {
+      if (e.key === "Escape") onClose();
+    }
+
+    if (open) {
+      document.addEventListener("keydown", handleEsc);
+      document.body.style.overflow = "hidden";
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEsc);
+      document.body.style.overflow = "";
+    };
+  }, [open, onClose]);
+
   if (!open) return null;
 
   return (
-    <div style={overlay}>
-      <div style={modal}>
-        <button style={closeBtn} onClick={onClose}>✕</button>
+    <div className="modal-overlay" onClick={onClose}>
+      <div
+        className={`modal modal--${variant}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button className="modal-close" onClick={onClose}>
+          ✕
+        </button>
+
         {children}
       </div>
     </div>
   );
 }
-
-const overlay = {
-  position: "fixed",
-  inset: 0,
-  background: "rgba(0,0,0,0.6)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  zIndex: 1000,
-};
-
-const modal = {
-  background: "#111",
-  color: "#fff",
-  padding: "20px",
-  borderRadius: "12px",
-  width: "90%",
-  maxWidth: "420px",
-  position: "relative",
-};
-
-const closeBtn = {
-  position: "absolute",
-  top: "10px",
-  right: "10px",
-  background: "transparent",
-  color: "#fff",
-  border: "none",
-  fontSize: "18px",
-  cursor: "pointer",
-};

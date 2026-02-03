@@ -1,10 +1,13 @@
 import { supabase } from "../lib/supabase";
 import { useNavigate, Link } from "react-router-dom";
 import { useProfile } from "../context/ProfileContext";
+import { useTheme } from "../context/ThemeContext";
+import "./Header.css";
 
 export default function Header() {
   const navigate = useNavigate();
   const { profile, loading } = useProfile();
+  const { theme, toggleTheme } = useTheme(); // ✅ ONLY source of truth
 
   async function logout() {
     await supabase.auth.signOut();
@@ -12,53 +15,31 @@ export default function Header() {
   }
 
   return (
-    <header
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "12px 20px",
-        background: "#0d0d0d",
-        borderBottom: "1px solid #222",
-        color: "#fff",
-      }}
-    >
-      <div>
-        <b>Student Dashboard</b>
+    <header className="header">
+      <div className="header-left">
+        <span className="brand">Trackly</span>
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "16px",
-        }}
-      >
+      <div className="header-right">
         {!loading && profile && (
-          <span style={{ opacity: 0.85 }}>
-            @{profile.username}
-          </span>
+          <span className="username">@{profile.username}</span>
         )}
 
-        <Link
-          to="/profile"
-          style={{ color: "#aaa", textDecoration: "none" }}
-        >
+        <Link to="/profile" className="profile-link">
           Profile
         </Link>
 
+        {/* THEME TOGGLE */}
         <button
-          onClick={logout}
-          style={{
-            background: "transparent",
-            border: "1px solid #333",
-            color: "#fff",
-            padding: "4px 10px",
-            borderRadius: "6px",
-            cursor: "pointer",
-          }}
+          className="theme-toggle"
+          onClick={toggleTheme}
+          title="Toggle theme"
         >
-          Logout
+          {theme === "dark" ? "🌙" : "☀️"}
+        </button>
+
+        <button onClick={logout} className="logout-btn">
+          Log out
         </button>
       </div>
     </header>

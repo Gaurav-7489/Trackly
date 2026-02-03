@@ -1,5 +1,6 @@
 import { useTasks } from "../context/TaskContext";
 import { calculateWeeklyScore } from "../lib/weeklyScoreLogic";
+import "./WeeklyScore.css";
 
 export default function WeeklyScore() {
   const { weeklyTasks, weekStart, loading } = useTasks();
@@ -8,22 +9,28 @@ export default function WeeklyScore() {
 
   const score = calculateWeeklyScore(weeklyTasks);
 
+  const level =
+    score >= 80 ? "great" : score >= 50 ? "okay" : "low";
+
   return (
-    <div
-      style={{
-        marginTop: "20px",
-        padding: "14px",
-        borderRadius: "12px",
-        background: "#111",
-        color: "#fff",
-        maxWidth: "300px",
-      }}
-    >
-      <b>Weekly Score</b>
-      <p style={{ fontSize: "26px", margin: "8px 0" }}>
-        {score}%
+    <section className={`weekly-score ${level}`}>
+      <div className="score-header">
+        <span className="label">Weekly Score</span>
+        <span className="week">Week of {weekStart}</span>
+      </div>
+
+      <div className="score-value">
+        {score}
+        <span>%</span>
+      </div>
+
+      <p className="score-hint">
+        {score >= 80
+          ? "Strong week. Keep momentum."
+          : score >= 50
+          ? "Decent progress. Room to push."
+          : "Low activity. Start small."}
       </p>
-      <small>Week starting {weekStart}</small>
-    </div>
+    </section>
   );
 }

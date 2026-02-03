@@ -44,7 +44,7 @@ export default function Intro() {
                         className="secondary"
                         onClick={() =>
                             window.open(
-                                "https://www.linkedin.com/posts/YOUR_POST_LINK",
+                                "https://www.linkedin.com/posts/gaurav-bhardwaj-8080a1325_fullstackdevelopment-webdevelopment-reactjs-activity-7424437337289379840-cz3B?utm_source=share&utm_medium=member_desktop&rcm=ACoAAFIPhUgBscPkSLUzeaBsduR0GniZvN2rJ-o",
                                 "_blank",
                                 "noopener,noreferrer"
                             )

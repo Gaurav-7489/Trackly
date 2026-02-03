@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "./Login.css";
 
-
 const MAX_ATTEMPTS = 5;
 const BLOCK_TIME = 10 * 60 * 1000; // 10 minutes
 
@@ -18,7 +17,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
 
-  // auto redirect
+  // auto redirect if already logged in
   useEffect(() => {
     if (user) navigate("/dashboard");
   }, [user, navigate]);
@@ -52,6 +51,7 @@ export default function Login() {
     setLoading(true);
 
     try {
+      // ---------------- SIGN UP ----------------
       if (isSignup) {
         const { data, error } = await supabase.auth.signUp({
           email,
@@ -67,15 +67,16 @@ export default function Login() {
           });
         }
 
-        if (!data.session) {
-          setMessage("Account created. Check your email to verify.");
-        } else {
-          setMessage("Account created. Logging you in...");
-        }
+        setMessage(
+          "Account created. Check your email, confirm it, then come back here to log in."
+        );
 
         resetLoginState();
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
+      }
+
+      // ---------------- LOGIN ----------------
+      else {
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
@@ -88,7 +89,8 @@ export default function Login() {
             setMessage("Too many failed attempts. Locked for 10 minutes.");
           } else {
             setMessage(
-              `Invalid credentials. Attempts left: ${MAX_ATTEMPTS - state.attempts
+              `Invalid credentials. Attempts left: ${
+                MAX_ATTEMPTS - state.attempts
               }`
             );
           }
@@ -97,7 +99,18 @@ export default function Login() {
           throw error;
         }
 
+        // 🔐 EMAIL VERIFICATION CHECK
+        if (!data.user.email_confirmed_at) {
+          await supabase.auth.signOut();
+          setMessage(
+            "Email not verified yet. Confirm the email and then log in."
+          );
+          setLoading(false);
+          return;
+        }
+
         resetLoginState();
+        navigate("/dashboard");
       }
     } catch (err) {
       console.error(err);
@@ -139,13 +152,12 @@ export default function Login() {
         >
           {loading ? "processing..." : isSignup ? "Sign up" : "Login"}
         </button>
+
         <p className="micro">
           {isSignup
-            ? "Takes less than a minute. We timed it."
+            ? "Confirm your email after signup. No shortcuts."
             : "Welcome back. Let’s continue where you left off."}
         </p>
-
-
       </form>
 
       {message && <p className="msg">{message}</p>}

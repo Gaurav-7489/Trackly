@@ -13,6 +13,11 @@
 
   color: var(--text);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+
+  /* 🔑 IMPORTANT */
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
 }
 
 /* header */
@@ -37,8 +42,17 @@
 
 /* chart container */
 .graph-container {
+  flex: 1;              /* 🔥 THIS LINE */
+  min-height: 260px;    /* 🔥 AND THIS */
   width: 100%;
-  height: clamp(240px, 40vh, 320px);
+}
+
+/* loading / empty states */
+.graph-loading,
+.graph-empty {
+  color: var(--muted);
+  font-size: 0.8rem;
+  padding: 1rem;
 }
 
 /* light theme polish */

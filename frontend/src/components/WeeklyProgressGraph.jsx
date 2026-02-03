@@ -15,34 +15,40 @@ import "./WeeklyProgressGraph.css";
 export default function WeeklyProgressGraph() {
   const { entries, weekStart, loading } = useTasks();
 
-  if (loading) return null;
+  if (loading) {
+    return (
+      <section className="weekly-graph">
+        <p className="graph-loading">Loading graph…</p>
+      </section>
+    );
+  }
 
   const safeEntries = Array.isArray(entries) ? entries : [];
   const data = buildWeeklyGraph(safeEntries);
+
+  if (!data || data.length === 0) {
+    return (
+      <section className="weekly-graph">
+        <p className="graph-empty">No data yet</p>
+      </section>
+    );
+  }
 
   return (
     <section className="weekly-graph">
       <div className="graph-header">
         <h3>Weekly Progress</h3>
-        <span className="graph-sub">
-          Week of {weekStart}
-        </span>
+        <span className="graph-sub">Week of {weekStart}</span>
       </div>
 
       <div className="graph-container">
-        <ResponsiveContainer width="100%" height={200}>
+        <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} barGap={6}>
             <CartesianGrid strokeDasharray="3 3" stroke="#1f1f1f" />
-            <XAxis
-              dataKey="day"
-              stroke="#888"
-              tick={{ fontSize: 12 }}
-            />
-            <YAxis
-              allowDecimals={false}
-              stroke="#888"
-              tick={{ fontSize: 12 }}
-            />
+
+            <XAxis dataKey="day" stroke="#888" tick={{ fontSize: 12 }} />
+            <YAxis allowDecimals={false} stroke="#888" tick={{ fontSize: 12 }} />
+
             <Tooltip
               contentStyle={{
                 background: "#111",
@@ -52,11 +58,12 @@ export default function WeeklyProgressGraph() {
                 fontSize: "12px",
               }}
             />
+
             <Legend wrapperStyle={{ fontSize: "12px" }} />
+
             <Bar dataKey="done" fill="#22c55e" radius={[4, 4, 0, 0]} />
             <Bar dataKey="skipped" fill="#fa9e15" radius={[4, 4, 0, 0]} />
             <Bar dataKey="missed" fill="#ef4444" radius={[4, 4, 0, 0]} />
-
           </BarChart>
         </ResponsiveContainer>
       </div>

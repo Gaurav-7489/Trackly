@@ -1,80 +1,133 @@
-/* ROOT CARD */
 .task-board {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 1rem;
   padding: 1.5rem;
-  box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.08);
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-/* MAIN TITLE */
 .task-title-main {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
 }
 
-/* ADD TASK */
 .task-add {
   display: flex;
-  gap: 0.6rem;
-  margin-bottom: 1.5rem;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
 }
 
 .task-add input {
   flex: 1;
-  padding: 0.65rem 0.9rem;
-  border-radius: 0.6rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
   border: 1px solid var(--border);
   background: var(--bg);
   color: var(--text);
+  outline: none;
 }
 
 .task-add button {
-  padding: 0.6rem 1rem;
-  border-radius: 0.6rem;
+  padding: 0 1.5rem;
+  border-radius: 0.75rem;
   border: none;
   background: #6366f1;
-  color: #fff;
-  font-weight: 500;
+  color: white;
+  font-weight: 600;
   cursor: pointer;
 }
 
-.task-add button:hover {
-  opacity: 0.9;
-}
-
-/* SECTION HEADERS */
-.section-title {
-  font-size: 0.9rem;
-  font-weight: 600;
-  margin: 1.2rem 0 0.8rem;
-  color: var(--text);
-}
-
-/* TODAY BLOCK */
 .task-today {
-  padding: 1rem;
-  border-radius: 0.8rem;
-  background: linear-gradient(
-    180deg,
-    var(--bg),
-    color-mix(in srgb, var(--bg) 92%, #000 8%)
-  );
+  padding: 1.25rem;
+  border-radius: 1rem;
+  background: var(--bg);
   border: 1px solid var(--border);
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .today-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.6rem 0;
+  padding: 0.75rem 0;
   border-bottom: 1px solid var(--border);
 }
 
-.today-row:last-child {
-  border-bottom: none;
+.task-name-today {
+  font-weight: 500;
+  color: var(--text);
+}
+
+/* GRID STYLING */
+.task-grid-container {
+  overflow-x: auto; /* Handles mobile */
+}
+
+.task-grid {
+  min-width: 600px; /* Prevents squishing */
+}
+
+.grid-header, .grid-row {
+  display: grid;
+  /* Task name gets 30%, Days get equal share, Delete gets 10% */
+  grid-template-columns: 3fr repeat(7, 1fr) 1fr;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 0;
+}
+
+.grid-header {
+  border-bottom: 2px solid var(--border);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+}
+
+.grid-row {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+}
+
+.grid-row:hover {
+  background: rgba(0,0,0,0.02);
+}
+
+.task-name {
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.cell {
+  text-align: center;
+  font-size: 1.1rem;
+  cursor: default;
+}
+
+.cell.done { color: #22c55e; font-weight: bold; }
+.cell.skipped { filter: grayscale(0); }
+.cell.missed { color: #ef4444; }
+.cell.empty { color: var(--border); }
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #f87171;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: right;
+}
+
+.delete-btn:hover {
+  color: #ef4444;
+  text-decoration: underline;
 }
 
 .today-actions {
@@ -83,104 +136,16 @@
 }
 
 .today-actions button {
-  padding: 0.35rem 0.75rem;
-  border-radius: 999px;
+  padding: 0.4rem 1rem;
+  border-radius: 2rem;
   border: none;
   background: #111;
-  color: #fff;
-  font-size: 0.75rem;
+  color: white;
+  font-size: 0.8rem;
   cursor: pointer;
-}
-
-.today-actions button:hover {
-  opacity: 0.85;
-}
-
-/* WEEKLY GRID */
-.task-grid {
-  padding-top: 0.5rem;
-}
-
-.grid-header,
-.grid-row {
-  display: grid;
-  grid-template-columns: 1.4fr repeat(7, 1fr) 0.8fr;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.grid-header {
-  font-size: 0.7rem;
-  color: var(--muted);
-  margin-bottom: 0.4rem;
-}
-
-.grid-row {
-  padding: 0.6rem 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.grid-row:last-child {
-  border-bottom: none;
-}
-
-.task-name {
-  font-size: 0.85rem;
-}
-
-/* CELLS */
-.cell {
-  text-align: center;
-  font-size: 0.9rem;
-  color: var(--muted);
-}
-
-.cell.done {
-  color: #22c55e;
-}
-
-.cell.missed {
-  color: #ef4444;
-}
-
-.cell.skipped {
-  color: #f59e0b;
-}
-
-/* DELETE */
-.delete-btn {
-  background: transparent;
-  border: none;
-  color: #ef4444;
-  font-size: 0.75rem;
-  cursor: pointer;
-}
-
-.delete-btn:hover {
-  text-decoration: underline;
-}
-
-/* LOADING */
-.task-loading {
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-.cell.done {
-  color: #22c55e;
-  font-weight: bold;
-}
-
-.cell.skipped {
-  color: #f59e0b;
-}
-
-.cell.missed {
-  color: #ef4444;
 }
 
 .lazy-btn {
-  background: #111;
-  color: #facc15;
-  border-radius: 999px;
-  padding: 0.3rem 0.8rem;
+  background: #111 !important;
+  color: #facc15 !important;
 }

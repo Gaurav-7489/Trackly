@@ -43,7 +43,6 @@ export default function TaskBoard() {
     <section className="task-board">
       <h2 className="task-title-main">Weekly Tasks</h2>
 
-      {/* ADD TASK */}
       <div className="task-add">
         <input
           placeholder="+ Add task"
@@ -54,92 +53,61 @@ export default function TaskBoard() {
         <button onClick={handleAdd}>Add</button>
       </div>
 
-      {/* TODAY */}
       <div className="task-today">
         <h3 className="section-title">Today</h3>
-
+        {tasks.length === 0 && <p className="empty-state">No tasks added yet.</p>}
         {tasks.map((task) => {
-          const entry =
-            entriesByDate[todayISO]?.find(
-              (e) => e.task.id === task.id
-            );
-
+          const entry = entriesByDate[todayISO]?.find((e) => e.task.id === task.id);
           if (!entry) return null;
 
           return (
             <div key={task.id} className="today-row">
-              <span>{task.title}</span>
-
+              <span className="task-name-today">{task.title}</span>
               <div className="today-actions">
-                <button
-                  onClick={() =>
-                    toggleStatus(task.id, todayISO, "done")
-                  }
-                >
+                <button onClick={() => toggleStatus(task.id, todayISO, "done")}>
                   Done
                 </button>
-                <button
-                  className="lazy-btn"
-                  onClick={() =>
-                    toggleStatus(task.id, todayISO, "skipped")
-                  }
-                >
+                <button className="lazy-btn" onClick={() => toggleStatus(task.id, todayISO, "skipped")}>
                   Skip
                 </button>
-
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* WEEKLY OVERVIEW */}
-      <div className="task-grid">
+      <div className="task-grid-container">
         <h3 className="section-title">Weekly overview</h3>
-
-        <div className="grid-header nice">
-          <span />
-          {DAYS.map((d) => (
-            <span key={d}>{d}</span>
-          ))}
-          <span />
-        </div>
-
-        {tasks.map((task) => (
-          <div key={task.id} className="grid-row nice">
-            <span className="task-name">{task.title}</span>
-
-            {DAYS.map((_, i) => {
-              const iso = isoFromWeekday(weekStart, i);
-              const entry =
-                entriesByDate[iso]?.find(
-                  (e) => e.task.id === task.id
-                );
-
-              const status = entry?.status;
-
-              return (
-                <span
-                  key={iso}
-                  className={`cell ${status}`}
-                >
-                  {status === "done" && "✔"}
-                  {status === "skipped" && "😴"}
-                  {status === "missed" && "✖"}
-                  {!status && "☐"}
-
-                </span>
-              );
-            })}
-
-            <button
-              className="delete-btn"
-              onClick={() => deleteTask(task.id)}
-            >
-              Delete
-            </button>
+        <div className="task-grid">
+          <div className="grid-header">
+            <span className="label-task">Task</span>
+            {DAYS.map((d) => <span key={d} className="label-day">{d}</span>)}
+            <span className="label-action">Action</span>
           </div>
-        ))}
+
+          {tasks.map((task) => (
+            <div key={task.id} className="grid-row">
+              <span className="task-name" title={task.title}>{task.title}</span>
+              {DAYS.map((_, i) => {
+                const iso = isoFromWeekday(weekStart, i);
+                const entry = entriesByDate[iso]?.find((e) => e.task.id === task.id);
+                const status = entry?.status;
+
+                return (
+                  <span key={iso} className={`cell ${status || 'empty'}`}>
+                    {status === "done" && "✔"}
+                    {status === "skipped" && "😴"}
+                    {status === "missed" && "✖"}
+                    {!status && "☐"}
+                  </span>
+                );
+              })}
+              <button className="delete-btn" onClick={() => deleteTask(task.id)}>
+                Delete
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

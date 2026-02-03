@@ -1,5 +1,4 @@
 import { useTasks } from "../context/TaskContext";
-
 import { buildWeeklyGraph } from "../lib/weeklyGraphLogic";
 import {
   BarChart,
@@ -14,11 +13,12 @@ import {
 import "./WeeklyProgressGraph.css";
 
 export default function WeeklyProgressGraph() {
-  const { weeklyTasks, weekStart, loading } = useTasks();
+  const { entries, weekStart, loading } = useTasks();
 
   if (loading) return null;
 
-  const data = buildWeeklyGraph(weeklyTasks, weekStart);
+  const safeEntries = Array.isArray(entries) ? entries : [];
+  const data = buildWeeklyGraph(safeEntries);
 
   return (
     <section className="weekly-graph">
@@ -30,7 +30,7 @@ export default function WeeklyProgressGraph() {
       </div>
 
       <div className="graph-container">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height={200}>
           <BarChart data={data} barGap={6}>
             <CartesianGrid strokeDasharray="3 3" stroke="#1f1f1f" />
             <XAxis
@@ -54,7 +54,9 @@ export default function WeeklyProgressGraph() {
             />
             <Legend wrapperStyle={{ fontSize: "12px" }} />
             <Bar dataKey="done" fill="#22c55e" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="skipped" fill="#fa9e15" radius={[4, 4, 0, 0]} />
             <Bar dataKey="missed" fill="#ef4444" radius={[4, 4, 0, 0]} />
+
           </BarChart>
         </ResponsiveContainer>
       </div>

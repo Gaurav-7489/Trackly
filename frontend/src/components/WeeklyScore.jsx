@@ -3,11 +3,12 @@ import { calculateWeeklyScore } from "../lib/weeklyScoreLogic";
 import "./WeeklyScore.css";
 
 export default function WeeklyScore() {
-  const { weeklyTasks, weekStart, loading } = useTasks();
+  const { entries, weekStart, loading } = useTasks();
 
   if (loading) return null;
 
-  const score = calculateWeeklyScore(weeklyTasks);
+  const safeEntries = Array.isArray(entries) ? entries : [];
+  const score = calculateWeeklyScore(safeEntries);
 
   const level =
     score >= 80 ? "great" : score >= 50 ? "okay" : "low";
@@ -16,7 +17,9 @@ export default function WeeklyScore() {
     <section className={`weekly-score ${level}`}>
       <div className="score-header">
         <span className="label">Weekly Score</span>
-        <span className="week">Week of {weekStart}</span>
+        <span className="week">
+          Week of {weekStart || "—"}
+        </span>
       </div>
 
       <div className="score-value">

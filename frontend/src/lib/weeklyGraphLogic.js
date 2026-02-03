@@ -1,29 +1,32 @@
-const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+// src/lib/weeklyGraphLogic.js
 
-export function buildWeeklyGraph(weeklyTasks, weekStart) {
-  const base = new Date(weekStart);
+export function buildWeeklyGraph(entries = []) {
+  if (!Array.isArray(entries)) return [];
+
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
   const map = {};
-
-  // init days
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(base);
-    d.setDate(base.getDate() + i);
-    const key = d.toDateString();
-
-    map[key] = {
-      day: DAYS[i],
+  days.forEach((d) => {
+    map[d] = {
+      day: d,
       done: 0,
+      skipped: 0, // 👈 lazy lives here
       missed: 0,
     };
-  }
-
-  weeklyTasks.forEach((t) => {
-    const key = new Date(t.created_at).toDateString();
-    if (!map[key]) return;
-
-    if (t.checked) map[key].done += 1;
-    else map[key].missed += 1;
   });
 
-  return Object.values(map);
+  for (const e of entries) {
+    if (!e || !e.entry_date || !e.status) continue;
+    if (e.status === "pending") continue;
+
+    const date = new Date(e.entry_date);
+    const index = (date.getDay() + 6) % 7; // Monday = 0
+    const label = days[index];
+
+    if (e.status === "done") map[label].done += 1;
+    if (e.status === "skipped") map[label].skipped += 1; // 👈 NEW
+    if (e.status === "missed") map[label].missed += 1;
+  }
+
+  return days.map((d) => map[d]);
 }

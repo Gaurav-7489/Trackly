@@ -1,21 +1,35 @@
 import { useState } from "react";
 import { useTasks } from "../context/TaskContext";
-import "./Taskboard.css";
+import "./TaskBoard.css";
 
+const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+function isoFromWeekday(weekStart, index) {
+  const d = new Date(weekStart);
+  d.setDate(d.getDate() + index);
+  return d.toISOString().slice(0, 10);
+}
 
 export default function TaskBoard() {
   const {
-    weeklyTasks,
-    loading,
-    addTask,
-    toggleTask,
-    deleteTask,
+    tasks,
+    entriesByDate,
     weekStart,
+    toggleStatus,
+    addTask,
+    deleteTask,
+    loading,
   } = useTasks();
 
   const [newTask, setNewTask] = useState("");
 
-  if (loading) return <p className="task-loading">Loading weekly tasks…</p>;
+  if (loading) {
+    return (
+      <section className="task-board">
+        <p className="task-loading">Loading weekly tasks…</p>
+      </section>
+    );
+  }
 
   function handleAdd() {
     if (!newTask.trim()) return;
@@ -23,16 +37,16 @@ export default function TaskBoard() {
     setNewTask("");
   }
 
+  const todayISO = new Date().toISOString().slice(0, 10);
+
   return (
     <section className="task-board">
-      <div className="task-header">
-        <h2>Weekly Tasks</h2>
-        <span className="week-label">Week of {weekStart}</span>
-      </div>
+      <h2 className="task-title-main">Weekly Tasks</h2>
 
+      {/* ADD TASK */}
       <div className="task-add">
         <input
-          placeholder="Add a task for this week…"
+          placeholder="+ Add task"
           value={newTask}
           onChange={(e) => setNewTask(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleAdd()}
@@ -40,38 +54,93 @@ export default function TaskBoard() {
         <button onClick={handleAdd}>Add</button>
       </div>
 
-      {weeklyTasks.length === 0 ? (
-        <p className="empty-state">No tasks yet. Start small.</p>
-      ) : (
-        <ul className="task-list">
-          {weeklyTasks.map((task) => (
-            <li
-              key={task.id}
-              className={`task-item ${task.checked ? "done" : ""}`}
-            >
-              <label className="task-check">
-                <input
-                  type="checkbox"
-                  checked={task.checked}
-                  onChange={() => toggleTask(task.id, task.checked)}
-                />
-                <span />
-              </label>
+      {/* TODAY */}
+      <div className="task-today">
+        <h3 className="section-title">Today</h3>
 
+        {tasks.map((task) => {
+          const entry =
+            entriesByDate[todayISO]?.find(
+              (e) => e.task.id === task.id
+            );
 
-              <span className="task-title">{task.title}</span>
+          if (!entry) return null;
 
-              <button
-                className="delete-btn"
-                onClick={() => deleteTask(task.id)}
-                aria-label="Delete task"
-              >
-                ✕
-              </button>
-            </li>
+          return (
+            <div key={task.id} className="today-row">
+              <span>{task.title}</span>
+
+              <div className="today-actions">
+                <button
+                  onClick={() =>
+                    toggleStatus(task.id, todayISO, "done")
+                  }
+                >
+                  Done
+                </button>
+                <button
+                  className="lazy-btn"
+                  onClick={() =>
+                    toggleStatus(task.id, todayISO, "skipped")
+                  }
+                >
+                  Skip
+                </button>
+
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* WEEKLY OVERVIEW */}
+      <div className="task-grid">
+        <h3 className="section-title">Weekly overview</h3>
+
+        <div className="grid-header nice">
+          <span />
+          {DAYS.map((d) => (
+            <span key={d}>{d}</span>
           ))}
-        </ul>
-      )}
+          <span />
+        </div>
+
+        {tasks.map((task) => (
+          <div key={task.id} className="grid-row nice">
+            <span className="task-name">{task.title}</span>
+
+            {DAYS.map((_, i) => {
+              const iso = isoFromWeekday(weekStart, i);
+              const entry =
+                entriesByDate[iso]?.find(
+                  (e) => e.task.id === task.id
+                );
+
+              const status = entry?.status;
+
+              return (
+                <span
+                  key={iso}
+                  className={`cell ${status}`}
+                >
+                  {status === "done" && "✔"}
+                  {status === "skipped" && "😴"}
+                  {status === "missed" && "✖"}
+                  {!status && "☐"}
+
+                </span>
+              );
+            })}
+
+            <button
+              className="delete-btn"
+              onClick={() => deleteTask(task.id)}
+            >
+              Delete
+            </button>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }

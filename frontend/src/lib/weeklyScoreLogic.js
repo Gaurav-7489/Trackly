@@ -1,6 +1,28 @@
-export function calculateWeeklyScore(tasks) {
-  if (tasks.length === 0) return 0;
+// src/lib/weeklyScoreLogic.js
 
-  const done = tasks.filter((t) => t.checked).length;
-  return Math.round((done / tasks.length) * 100);
+export function calculateWeeklyScore(entries = []) {
+  if (!Array.isArray(entries) || entries.length === 0) {
+    return 0;
+  }
+
+  let total = 0;
+  let possible = 0;
+
+  for (const e of entries) {
+    // ignore future / pending
+    if (!e || !e.status) continue;
+    if (e.status === "pending") continue;
+
+    possible += 1;
+
+    if (e.status === "done") total += 1;
+    if (e.status === "missed") total -= 1;
+    // skipped = neutral
+  }
+
+  if (possible === 0) return 0;
+
+  const percent = (total / possible) * 100;
+
+  return Math.max(0, Math.round(percent));
 }

@@ -114,7 +114,7 @@ export default function Login() {
         <p>by "Under Outside The Stationary" clan</p>
       </div>
 
-      <h2>{isSignup ? "Create account" : "Login"}</h2>
+      <h2>{isSignup ? "Create account" : "Enter workspace"}</h2>
 
       <form onSubmit={handleSubmit}>
         <input
@@ -151,7 +151,7 @@ export default function Login() {
       {message && <p className="msg">{message}</p>}
 
       <button className="link" onClick={() => setIsSignup(!isSignup)}>
-        {isSignup ? "Already have an account?" : "New here?"}
+        {isSignup ? "Already have an account?" : "First time? Create an account"}
       </button>
     </div>
   );

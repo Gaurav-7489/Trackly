@@ -151,7 +151,7 @@ export default function Login() {
     <div className="auth-wrap">
       <div className="brand">
         <h1>Trackly</h1>
-        <p>by "Under Outside The Stationary" clan</p>
+        <p>by gauravbhardwaj7489@gmail.com</p>
       </div>
 
       <h2>{isSignup ? "Create account" : "Enter workspace"}</h2>
